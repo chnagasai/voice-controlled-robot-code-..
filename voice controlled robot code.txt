@@ -1,0 +1,78 @@
+# Example showing how functions, that accept tuples of rgb values,
+# simplify working with gradients
+from machine import Pin, UART,PWM, ADC
+import time,utime
+buz = Pin(2, Pin.OUT)
+trigger = Pin(20, Pin.OUT)
+echo = Pin(21, Pin.IN)
+def ultra():
+   trigger.low()
+   utime.sleep_us(2)
+   trigger.high()
+   utime.sleep_us(5)
+   trigger.low()
+   while echo.value() == 0:
+       signaloff = utime.ticks_us()
+   while echo.value() == 1:
+       signalon = utime.ticks_us()
+   timepassed = signalon - signaloff
+   distance = (timepassed * 0.0343) / 2
+   return distance
+rcv = UART(1, baudrate=9600, tx=Pin(4), rx=Pin(5))
+buff = bytearray(255)
+TIMEOUT = False
+
+
+m11=Pin(9,Pin.OUT)
+m12=Pin(8,Pin.OUT)
+m21=Pin(7,Pin.OUT)
+m22=Pin(6,Pin.OUT)
+
+m11.value(0)
+m12.value(0)
+m21.value(0)
+m22.value(0)
+while(1):
+    dist=ultra()
+    print(dist)
+    utime.sleep(0.51)
+    if(dist<15):
+       buz.value(1)
+       time.sleep(1)
+       buz.value(0)
+    x=rcv.read()
+    print(x)
+    if x is not None:
+        x=x.decode()
+        
+
+            
+        if(x=='3'):
+            m11.value(1)
+            m12.value(0)
+            m21.value(1)
+            m22.value(0)
+            
+        if(x=='4'):
+            m11.value(0)
+            m12.value(1)
+            m21.value(0)
+            m22.value(1)
+            
+        if(x=='5'):
+            m11.value(1)
+            m12.value(0)
+            m21.value(0)
+            m22.value(1)
+            
+        if(x=='6'):
+            m11.value(0)
+            m12.value(1)
+            m21.value(1)
+            m22.value(0)
+            
+        if(x=='7'):
+            m11.value(0)
+            m12.value(0)
+            m21.value(0)
+            m22.value(0)
